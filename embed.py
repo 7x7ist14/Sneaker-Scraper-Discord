@@ -18,32 +18,13 @@ restocks_stock_payout = main.restocks_stock_payout
 hypeboost_prices_payout = main.hypeboost_prices_payout
 
 
-if not TOKEN:
-    raise ValueError("The Bot-Token was not included in the config.py file")
+required_variables = ['TOKEN', 'CHANNEL_NAME', 'COMMAND_PREFIX_ALL', 'COMMAND_PREFIX_RESTOCKS',
+                      'COMMAND_PREFIX_HYPEBOOST', 'COMMAND_PREFIX_SNEAKIT', 'COMMAND_PREFIX_RESTOCKS_PAYOUT',
+                      'COMMAND_PREFIX_HYPEBOOST_PAYOUT', 'COMMAND_PREFIX_PAYOUT_ALL']
 
-if not CHANNEL_NAME:
-    raise ValueError("The Channel-Name was not included in the config.py file")
-
-if not COMMAND_PREFIX_ALL:
-    raise ValueError("The Command-Prefix for AIO Scraper was not included in the config.py file")
-
-if not COMMAND_PREFIX_RESTOCKS:
-    raise ValueError("The Command-Prefix for Restocks Scraper was not included in the config.py file")
-
-if not COMMAND_PREFIX_HYPEBOOST:
-    raise ValueError("The Command-Prefix for Hypeboost Scraper was not included in the config.py file")
-
-if not COMMAND_PREFIX_SNEAKIT:
-    raise ValueError("The Command-Prefix for Sneakit Scraper was not included in the config.py file")
-
-if not COMMAND_PREFIX_RESTOCKS_PAYOUT:
-    raise ValueError("The Command-Prefix for Restocks Payout Scraper was not included in the config.py file")
-
-if not COMMAND_PREFIX_HYPEBOOST_PAYOUT:
-    raise ValueError("The Command-Prefix for Hypeboost Payout Scraper was not included in the config.py file")
-
-if not COMMAND_PREFIX_PAYOUT_ALL:
-    raise ValueError("The Command-Prefix for AIO Payout Scraper was not included in the config.py file")
+for variable in required_variables:
+    if not globals().get(variable):
+        raise ValueError(f"The {variable} was not included in the config.py file")
 
 bot = commands.Bot(command_prefix=COMMAND_PREFIX_ALL, intents=discord.Intents.all())
 
