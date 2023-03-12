@@ -2,7 +2,7 @@ import discord
 import main
 import datetime
 from discord.ext import commands
-from config import TOKEN, CHANNEL_NAME, COMMAND_PREFIX_ALL, COMMAND_PREFIX_RESTOCKS, COMMAND_PREFIX_HYPEBOOST, COMMAND_PREFIX_SNEAKIT, COMMAND_PREFIX_RESTOCKS_PAYOUT, COMMAND_PREFIX_HYPEBOOST_PAYOUT, COMMAND_PREFIX_PAYOUT_ALL
+from config import *
 
 restocks_product_url = main.restocks_product_url
 stockx_product_url = main.stockx_product_url
