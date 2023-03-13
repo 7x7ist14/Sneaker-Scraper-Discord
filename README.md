@@ -11,13 +11,11 @@ Supported sites are:
 
 Check if you have all the needed Python libraries.
 
-+ requests (pip install requests)
-+ json (pip install json)
-+ BeautifulSoup (pip install beautifulsoup4)
-+ Discord (pip install discord.py)
-+ selenium (pip install selenium)
-
---> to install them just write the pip install... command in your Terminal.
+-->To install all needed libraries just do this:
++ open the folder that contains all files (the folder name should be "Sneaker-Scraper-Discord") in your file Explorer.
++ click on the path and write "cmd" --> now click enter
++ you should now see a cmd window, you just have to type "pip install -r requirements.txt" 
++ all needed libraries should now be installed and your good to go :)
 
 # Chrome Driver
 Please Check that you have the same version of the chrome driver in the folder with the scraper files as your main chrome is!
@@ -30,9 +28,13 @@ In the folder is the version: ChromeDriver 111.0.5563.65
 
 # How to use
 
-1. Open the config.py file and input your Discord Bot Token and the name of the discord channel were you want to use the scraper in.
+1. install all files and extract the zip file. --> check if you have all needed files in the folder. (main.py, embed.py, config.py, chromedriver.exe, requirements.txt)
 
-2. Check or change the commands in the config.py file if you want to.
+2. install requirements.txt --> go to #requirements section to see how
+
+3. Open the config.py file and input your Discord Bot Token and the name of the discord channel were you want to use the scraper in.
+
+4. Check or change the commands in the config.py file if you want to.
 --> The commands can be changed if you want to, here are all default commands:
 
 + COMMAND_PREFIX_ALL = "$scrape"    (Scraper for all sites at the same time --> only listing prices)
@@ -43,16 +45,16 @@ In the folder is the version: ChromeDriver 111.0.5563.65
 + COMMAND_PREFIX_RESTOCKS_PAYOUT = "$r" (Scraper for Restocks only --> payout prices only)
 + COMMAND_PREFIX_HYPEBOOST_PAYOUT = "$h" (Scraper for Hypeboost only --> payout prices only)
 
-3. Open and run the "discord_embed" file. (best for this is VS-Code in my opinion)
+5. Open and run the "discord_embed" file. (best for this is VS-Code in my opinion)
 --> updated running process will be added soon.
 
-4. Write the keyword / commadnd with the SKU of a sneaker in your discord channel. You can change all commands if you want to in the config.py file.
+6. Write the keyword / commadnd with the SKU of a sneaker in your discord channel. You can change all commands if you want to in the config.py file.
 Format examples:
 + $scrape DD1503-101
 + $payout DD1503-101
 + .... and so on
 
-5. The Scraper will now collect all the data and will return you a message with all sizes and prices in your discord channel.
+7. The Scraper will now collect all the data and will return you a message with all sizes and prices in your discord channel.
 
 # Features:
 + Product URL's of your scraped product for multiple marketplace websites in the return message. (StockX, Restocks, GOAT, Hypeboost, Sneakit)
