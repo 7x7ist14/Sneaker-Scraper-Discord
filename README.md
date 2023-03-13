@@ -75,5 +75,9 @@ Format examples:
 ![image](https://user-images.githubusercontent.com/103487648/224563083-ef76a39c-5a2c-4a60-a30d-3fce8ce75662.png)
 
 
+# False command return message:
+--> this message will return if you send the wrong command. (the commmand list automaticaly adapts to the commands you put in the config.py file)
+
+![image](https://user-images.githubusercontent.com/103487648/224793201-446f0d00-ac24-4b76-ae9b-79baf2d651e7.png)
 
 
