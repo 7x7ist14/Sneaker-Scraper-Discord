@@ -437,9 +437,6 @@ async def on_message(message):
           inline=False
         )
       embed.set_footer(
-          text="Developed by Jakob.AIO"
-        )
-      embed.set_footer(
           text=f"Developed by JakobAIO      |      Command list      |      {datetime.datetime.now().strftime('%H:%M:%S')}"
         )
       await message.channel.send(embed=embed)
