@@ -398,7 +398,50 @@ async def on_message(message):
         print('Hypeboost Payout Scraping Successful!')
 
     elif message.content.startswith("$"):
-      await message.channel.send("Wrong command unfortunatly!")
+      await message.channel.send("***Wrong command unfortunatly!***")
       print("False command used!")
+      prefixes = {
+          "AIO Scraper": COMMAND_PREFIX_ALL,
+          "Restocks-Scraper": COMMAND_PREFIX_RESTOCKS,
+          "Hypeboost-Scraper": COMMAND_PREFIX_HYPEBOOST,
+          "Sneakit-Scraper": COMMAND_PREFIX_SNEAKIT,
+          "AIO Payout Scraper": COMMAND_PREFIX_PAYOUT_ALL,
+          "Restocks-Payout Scraper": COMMAND_PREFIX_RESTOCKS_PAYOUT,
+          "Hypeboost-Payout Scraper": COMMAND_PREFIX_HYPEBOOST_PAYOUT
+      }
+
+      commands = "\n".join([f"{key}: {value}" for key, value in prefixes.items()])
+      message_text = f"\n{commands}"
+
+      embed = discord.Embed(
+          title="False command used!",
+          url="https://twitter.com/jakobaio",
+          color=0xe74c3c
+        )
+      embed.set_author(
+          name="Scraper command error!",
+          url="https://twitter.com/jakobaio",
+          icon_url= "https://i.imgur.com/mtt9JCN.png"
+          )
+      embed.set_thumbnail(
+          url="https://cdn.pixabay.com/photo/2013/04/01/09/21/attention-98513_960_720.png"
+        )
+      embed.add_field(
+          name="Here is a command list:",
+          value=message_text,
+          inline=True
+        )
+      embed.add_field(
+          name="How to use:",
+          value=f"Example: {COMMAND_PREFIX_ALL} DD1503-101",
+          inline=False
+        )
+      embed.set_footer(
+          text="Developed by Jakob.AIO"
+        )
+      embed.set_footer(
+          text=f"Developed by JakobAIO      |      Command list      |      {datetime.datetime.now().strftime('%H:%M:%S')}"
+        )
+      await message.channel.send(embed=embed)
 
 bot.run(TOKEN)
