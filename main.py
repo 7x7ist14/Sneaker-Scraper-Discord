@@ -7,6 +7,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 
+
 def restocks_product_url(SKU):
   base_url = 'https://restocks.net/de/shop/search?q='
   request_url = base_url + SKU + '&page=1&filters[0][range][price][gte]=1'
@@ -125,7 +126,6 @@ def restocks_stock(SKU):
   options.headless = True
   driver = webdriver.Chrome(options=options)
   driver.get(product_url)
-
   cookies = driver.find_element(by=By.ID, value='save__first__localization__button')
   cookies.click()
   time.sleep(2)
@@ -308,5 +308,35 @@ def sneakit_info(SKU):
   print("Scraped Sneakit info!")
   return output
 
+#price after fees
+def paypal_fees(price):
+  price_raw = float(price)
+  fees1 = price_raw * 0.0249
+  fees2 = 0.35
+  all_fees = price_raw - fees1 - fees2
+  rounden_fees = round(all_fees, 2)
+  final_price = str(rounden_fees) + "€"
+  #print(final_price)
+  return final_price
 
+#only fees
+def paypal_fees_2(price):
+  price_raw = float(price)
+  fees1 = price_raw * 0.0249
+  fees2 = 0.35
+  fees_all_1 = fees1 + fees2
+  rounded_fees = round(fees_all_1, 2)
+  fees_all = str(rounded_fees) + "€"
+  #print(fees_all)
+  return fees_all
+
+#price + fees
+def paypal_fees_3(price):
+  price_raw = float(price)
+  fees1 = price_raw * 0.0249
+  fees2 = 0.35
+  price1 = float(price) + float(fees1) + float(fees2)
+  rounded_price = round(price1, 2)
+  rounden_price2 = str(rounded_price) + "€"
+  return rounden_price2
 
