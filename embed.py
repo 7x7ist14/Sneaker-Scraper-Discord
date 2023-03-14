@@ -16,11 +16,13 @@ hypeboost_stock = main.hypeboost_stock
 sneakit_stock = main.sneakit_stock
 restocks_stock_payout = main.restocks_stock_payout
 hypeboost_prices_payout = main.hypeboost_prices_payout
-
+paypal_fees_price = main.paypal_fees
+paypal_fees_only = main.paypal_fees_2
+paypal_fees_to_price = main.paypal_fees_3
 
 required_variables = ['TOKEN', 'CHANNEL_NAME', 'COMMAND_PREFIX_ALL', 'COMMAND_PREFIX_RESTOCKS',
                       'COMMAND_PREFIX_HYPEBOOST', 'COMMAND_PREFIX_SNEAKIT', 'COMMAND_PREFIX_RESTOCKS_PAYOUT',
-                      'COMMAND_PREFIX_HYPEBOOST_PAYOUT', 'COMMAND_PREFIX_PAYOUT_ALL']
+                      'COMMAND_PREFIX_HYPEBOOST_PAYOUT', 'COMMAND_PREFIX_PAYOUT_ALL', 'SIZE_CHART_PREFIX', 'PAY_PAL_PREFIX']
 
 for variable in required_variables:
     if not globals().get(variable):
@@ -87,9 +89,6 @@ async def on_message(message):
           value=sneakit_stock_output,
           inline=True
         )
-        embed.set_footer(
-          text="Developed by Jakob.AIO"
-        )
         embed.add_field(
           name="Open Product on:",
           value=f"[[StockX]]({stockx_product_url_output})      " f"[[Sneakit]]({sneakit_product_url_output})      " f"[[Restocks]]({restocks_product_url_output})      " f"[[Hypeboost]]({hypeboost_product_url_output})      " f"[[GOAT]]({goat_url_output})      ",
@@ -101,6 +100,55 @@ async def on_message(message):
 
         await message.channel.send(embed=embed)
         print('AIO Scraping Successful!')
+
+    elif message.content.startswith(PAY_PAL_PREFIX):
+      await message.channel.send("Scraping PayPal fees...")
+
+      if PAY_PAL_PREFIX in message_content:
+        price_raw = message_content.replace(PAY_PAL_PREFIX, '')
+        price_raw1 = price_raw.replace("€", "")
+        price = price_raw1
+        paypal_fees_price_output = paypal_fees_price(price)
+        paypal_fees_only_output = paypal_fees_only(price)
+        paypal_fees_to_price_output = paypal_fees_to_price(price)
+        embed = discord.Embed(
+          title="PayPal fees",
+          url="https://www.paypal.com/de/home",
+          color=0x3498db
+        )
+        embed.set_author(
+          name="PayPal",
+          url="https://twitter.com/jakobaio",
+          icon_url= "https://cdn-icons-png.flaticon.com/512/2504/2504802.png"
+          )
+        embed.set_thumbnail(
+          url="https://cdn-icons-png.flaticon.com/512/888/888871.png"
+        )
+        embed.add_field(
+          name="Your input amount:",
+          value=price + "€",
+          inline=False
+        )
+        embed.add_field(
+          name="PayPal fees:",
+          value=paypal_fees_only_output,
+          inline=True
+        )
+        embed.add_field(
+          name="Price after fees:",
+          value=paypal_fees_price_output,
+          inline=False
+        )
+        embed.add_field(
+          name="PayPal fees added:",
+          value=paypal_fees_to_price_output,
+          inline=True
+        )
+        embed.set_footer(
+          text=f"Developed by JakobAIO      |      PayPal Fees Calculator      |      {datetime.datetime.now().strftime('%H:%M:%S')}"
+        )
+        await message.channel.send(embed=embed)
+        print('PayPal Fees Scraping Successful!')
 
     elif message.content.startswith(COMMAND_PREFIX_RESTOCKS):
       await message.channel.send("Scraping Restocks...")
@@ -134,9 +182,6 @@ async def on_message(message):
           name="Restocks Prices:",
           value=restocks_stock_output,
           inline=True
-        )
-        embed.set_footer(
-          text="Developed by Jakob.AIO"
         )
         embed.add_field(
           name="Open Product on:",
@@ -183,9 +228,6 @@ async def on_message(message):
           value=hypeboost_stock_output,
           inline=True
         )
-        embed.set_footer(
-          text="Developed by Jakob.AIO"
-        )
         embed.add_field(
           name="Open Product on:",
           value=f"[[StockX]]({stockx_product_url_output})      " f"[[Sneakit]]({sneakit_product_url_output})      " f"[[Restocks]]({restocks_product_url_output})      " f"[[Hypeboost]]({hypeboost_product_url_output})      " f"[[GOAT]]({goat_url_output})      ",
@@ -230,9 +272,6 @@ async def on_message(message):
           name="Sneakit Prices:",
           value=sneakit_stock_output,
           inline=True
-        )
-        embed.set_footer(
-          text="Developed by Jakob.AIO"
         )
         embed.add_field(
           name="Open Product on:",
@@ -286,9 +325,6 @@ async def on_message(message):
           value=restocks_prices_payout_output,
           inline=True
         )
-        embed.set_footer(
-          text="Developed by Jakob.AIO"
-        )
         embed.add_field(
           name="Open Product on:",
           value=f"[[StockX]]({stockx_product_url_output})      " f"[[Sneakit]]({sneakit_product_url_output})      " f"[[Restocks]]({restocks_product_url_output})      " f"[[Hypeboost]]({hypeboost_product_url_output})      " f"[[GOAT]]({goat_url_output})      ",
@@ -333,9 +369,6 @@ async def on_message(message):
           name="Restocks Payout Prices:",
           value=restocks_stock_payout_output,
           inline=True
-        )
-        embed.set_footer(
-          text="Developed by Jakob.AIO"
         )
         embed.add_field(
           name="Open Product on:",
@@ -382,9 +415,6 @@ async def on_message(message):
           value=hypeboost_prices_payout_output,
           inline=True
         )
-        embed.set_footer(
-          text="Developed by Jakob.AIO"
-        )
         embed.add_field(
           name="Open Product on:",
           value=f"[[StockX]]({stockx_product_url_output})      " f"[[Sneakit]]({sneakit_product_url_output})      " f"[[Restocks]]({restocks_product_url_output})      " f"[[Hypeboost]]({hypeboost_product_url_output})      " f"[[GOAT]]({goat_url_output})      ",
@@ -397,6 +427,13 @@ async def on_message(message):
         await message.channel.send(embed=embed)
         print('Hypeboost Payout Scraping Successful!')
 
+    elif message.content.startswith(SIZE_CHART_PREFIX):
+      await message.channel.send("***Size Chart:***")
+      with open('size_chart.jpg', 'rb') as f:
+        file = discord.File(f)
+        await message.channel.send(file=file)
+        print("Size chart send!")
+
     elif message.content.startswith("$"):
       await message.channel.send("***Wrong command unfortunatly!***")
       print("False command used!")
@@ -407,7 +444,9 @@ async def on_message(message):
           "Sneakit-Scraper": COMMAND_PREFIX_SNEAKIT,
           "AIO Payout Scraper": COMMAND_PREFIX_PAYOUT_ALL,
           "Restocks-Payout Scraper": COMMAND_PREFIX_RESTOCKS_PAYOUT,
-          "Hypeboost-Payout Scraper": COMMAND_PREFIX_HYPEBOOST_PAYOUT
+          "Hypeboost-Payout Scraper": COMMAND_PREFIX_HYPEBOOST_PAYOUT,
+          "Size Chart": SIZE_CHART_PREFIX,
+          "PayPal Fees Calculator": PAY_PAL_PREFIX
       }
 
       commands = "\n".join([f"{key}: {value}" for key, value in prefixes.items()])
@@ -440,5 +479,6 @@ async def on_message(message):
           text=f"Developed by JakobAIO      |      Command list      |      {datetime.datetime.now().strftime('%H:%M:%S')}"
         )
       await message.channel.send(embed=embed)
+      print("Command list send!")
 
 bot.run(TOKEN)
