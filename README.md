@@ -80,7 +80,8 @@ Format examples:
 # False command return message:
 --> this message will return if you send the wrong command. (the commmand list automaticaly adapts to the commands you put in the config.py file)
 
-![image](https://user-images.githubusercontent.com/103487648/224793201-446f0d00-ac24-4b76-ae9b-79baf2d651e7.png)
+![image](https://user-images.githubusercontent.com/103487648/225096393-96af6d10-90dc-4625-a5f6-d33b59610ba3.png)
+
 
 # PaPal fees calculator:
 ![image](https://user-images.githubusercontent.com/103487648/225095242-2ccf41bd-b6e2-4811-8f46-3abb15c62231.png)
