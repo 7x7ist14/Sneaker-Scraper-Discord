@@ -44,6 +44,8 @@ In the folder is the version: ChromeDriver 111.0.5563.65
 + COMMAND_PREFIX_PAYOUT_ALL = "$payout" (Scraper for all sites at the same time --> only payout prices)
 + COMMAND_PREFIX_RESTOCKS_PAYOUT = "$r" (Scraper for Restocks only --> payout prices only)
 + COMMAND_PREFIX_HYPEBOOST_PAYOUT = "$h" (Scraper for Hypeboost only --> payout prices only)
++ SIZE_CHART_PREFIX ="$sizes" (will send a size list from all sizes in every option --> look at "#Size list")
++ PAY_PAL_PREFIX ="$paypal" (will calculate you all paypal fees) format -->  $paypal 150€
 
 5. Open and run the "discord_embed" file. (best for this is VS-Code in my opinion)
 --> updated running process will be added soon.
@@ -80,4 +82,8 @@ Format examples:
 
 ![image](https://user-images.githubusercontent.com/103487648/224793201-446f0d00-ac24-4b76-ae9b-79baf2d651e7.png)
 
+# PaPal fees calculator:
+![image](https://user-images.githubusercontent.com/103487648/225095242-2ccf41bd-b6e2-4811-8f46-3abb15c62231.png)
 
+# Size list:
+![image](https://user-images.githubusercontent.com/103487648/225095890-76c6c2c0-897c-4245-8a2d-69980c86bd5a.png)
