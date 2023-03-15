@@ -22,7 +22,8 @@ paypal_fees_to_price = main.paypal_fees_3
 
 required_variables = ['TOKEN', 'CHANNEL_NAME', 'COMMAND_PREFIX_ALL', 'COMMAND_PREFIX_RESTOCKS',
                       'COMMAND_PREFIX_HYPEBOOST', 'COMMAND_PREFIX_SNEAKIT', 'COMMAND_PREFIX_RESTOCKS_PAYOUT',
-                      'COMMAND_PREFIX_HYPEBOOST_PAYOUT', 'COMMAND_PREFIX_PAYOUT_ALL', 'SIZE_CHART_PREFIX', 'PAY_PAL_PREFIX']
+                      'COMMAND_PREFIX_HYPEBOOST_PAYOUT', 'COMMAND_PREFIX_PAYOUT_ALL', 'SIZE_CHART_PREFIX',
+                      'PAY_PAL_PREFIX', 'COMMAND_LIST', 'URL_PREFIX']
 
 for variable in required_variables:
     if not globals().get(variable):
@@ -149,6 +150,63 @@ async def on_message(message):
         )
         await message.channel.send(embed=embed)
         print('PayPal Fees Scraping Successful!')
+
+    elif message.content.startswith(URL_PREFIX):
+      await message.channel.send("Scraping product URL's...")
+
+      if URL_PREFIX in message_content:
+        SKU_raw = message_content.replace(URL_PREFIX, '')
+        SKU = SKU_raw.replace(" ", "")
+        hypeboost_product_url_output = hypeboost_product_url(SKU)
+        restocks_product_url_output = restocks_product_url(SKU)
+        stockx_product_url_output = stockx_product_url(SKU)
+        sneakit_product_url_output = sneakit_product_url(SKU)
+        goat_url_output = goat_url(SKU)
+        product_title_output = product_title(SKU)
+        product_img_output = product_img(SKU,restocks_product_url)
+        embed = discord.Embed(
+          title=product_title_output,
+          url="https://twitter.com/jakobaio",
+          color=0x95a5a6
+        )
+        embed.set_author(
+          name="URL Scraper",
+          url="https://twitter.com/jakobaio",
+          icon_url= "https://cdn.pixabay.com/photo/2016/03/21/23/25/link-1271843_960_720.png"
+          )
+        embed.set_thumbnail(
+          url=product_img_output
+        )
+        embed.add_field(
+          name="",
+          value=f"[[StockX]]({stockx_product_url_output})",
+          inline=False
+        )
+        embed.add_field(
+          name="",
+          value=f"[[Restocks]]({restocks_product_url_output})",
+          inline=False
+        )
+        embed.add_field(
+          name="",
+          value=f"[[GOAT]]({goat_url_output})",
+          inline=False
+        )
+        embed.add_field(
+          name="",
+          value=f"[[Hypeboost]]({hypeboost_product_url_output})",
+          inline=False
+        )
+        embed.add_field(
+          name="",
+          value=f"[[Sneakit]]({sneakit_product_url_output})",
+          inline=False
+        )
+        embed.set_footer(
+          text=f"Developed by JakobAIO      |      PayPal Fees Calculator      |      {datetime.datetime.now().strftime('%H:%M:%S')}"
+        )
+        await message.channel.send(embed=embed)
+        print('Scraped URLs')
 
     elif message.content.startswith(COMMAND_PREFIX_RESTOCKS):
       await message.channel.send("Scraping Restocks...")
@@ -434,6 +492,54 @@ async def on_message(message):
         await message.channel.send(file=file)
         print("Size chart send!")
 
+    elif message.content.startswith(COMMAND_LIST):
+      if COMMAND_LIST in message_content:
+        prefixes = {
+            "AIO Scraper": COMMAND_PREFIX_ALL,
+            "Restocks-Scraper": COMMAND_PREFIX_RESTOCKS,
+            "Hypeboost-Scraper": COMMAND_PREFIX_HYPEBOOST,
+            "Sneakit-Scraper": COMMAND_PREFIX_SNEAKIT,
+            "AIO Payout Scraper": COMMAND_PREFIX_PAYOUT_ALL,
+            "Restocks-Payout Scraper": COMMAND_PREFIX_RESTOCKS_PAYOUT,
+            "Hypeboost-Payout Scraper": COMMAND_PREFIX_HYPEBOOST_PAYOUT,
+            "Size Chart": SIZE_CHART_PREFIX,
+            "PayPal Fees Calculator": PAY_PAL_PREFIX,
+            "Command list": COMMAND_LIST,
+            "All product url's": URL_PREFIX
+        }
+
+        commands = "\n".join([f"{key}: {value}" for key, value in prefixes.items()])
+        message_text = f"\n{commands}"
+
+        embed = discord.Embed(
+            title="Command List",
+            url="https://twitter.com/jakobaio",
+            color=0xe74c3c
+          )
+        embed.set_author(
+            name="Scraper commands",
+            url="https://twitter.com/jakobaio",
+            icon_url= "https://i.imgur.com/mtt9JCN.png"
+            )
+        embed.set_thumbnail(
+            url="https://cdn.pixabay.com/photo/2013/04/01/09/21/attention-98513_960_720.png"
+          )
+        embed.add_field(
+            name="Here are the commands:",
+            value=message_text,
+            inline=True
+          )
+        embed.add_field(
+            name="How to use:",
+            value=f"Example: {COMMAND_PREFIX_ALL} DD1503-101",
+            inline=False
+          )
+        embed.set_footer(
+            text=f"Developed by JakobAIO      |      Command list      |      {datetime.datetime.now().strftime('%H:%M:%S')}"
+          )
+        await message.channel.send(embed=embed)
+        print("Command list send!")
+
     elif message.content.startswith("$"):
       await message.channel.send("***Wrong command unfortunatly!***")
       print("False command used!")
@@ -446,7 +552,9 @@ async def on_message(message):
           "Restocks-Payout Scraper": COMMAND_PREFIX_RESTOCKS_PAYOUT,
           "Hypeboost-Payout Scraper": COMMAND_PREFIX_HYPEBOOST_PAYOUT,
           "Size Chart": SIZE_CHART_PREFIX,
-          "PayPal Fees Calculator": PAY_PAL_PREFIX
+          "PayPal Fees Calculator": PAY_PAL_PREFIX,
+          "Command list": COMMAND_LIST,
+          "All product url's": URL_PREFIX
       }
 
       commands = "\n".join([f"{key}: {value}" for key, value in prefixes.items()])
