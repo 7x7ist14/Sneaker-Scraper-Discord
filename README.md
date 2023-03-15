@@ -82,7 +82,8 @@ Format examples:
 # False command return message:
 --> this message will return if you send the wrong command. (the commmand list automaticaly adapts to the commands you put in the config.py file)
 
-![image](https://user-images.githubusercontent.com/103487648/225096393-96af6d10-90dc-4625-a5f6-d33b59610ba3.png)
+![image](https://user-images.githubusercontent.com/103487648/225386421-7493215a-bcb8-4185-98c6-6aa1d78c9a26.png)
+
 
 
 # PaPal fees calculator:
@@ -90,3 +91,12 @@ Format examples:
 
 # Size list:
 ![image](https://user-images.githubusercontent.com/103487648/225095890-76c6c2c0-897c-4245-8a2d-69980c86bd5a.png)
+
+# Command list:
+
+![image](https://user-images.githubusercontent.com/103487648/225386973-0d154462-a067-45a1-b069-afa1f4c4d144.png)
+
+# Product urls:
+
+![image](https://user-images.githubusercontent.com/103487648/225387194-da60f9d8-565a-4872-9e0e-fb1b1842875b.png)
+
