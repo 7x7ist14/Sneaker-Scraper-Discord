@@ -46,6 +46,8 @@ In the folder is the version: ChromeDriver 111.0.5563.65
 + COMMAND_PREFIX_HYPEBOOST_PAYOUT = "$h" (Scraper for Hypeboost only --> payout prices only)
 + SIZE_CHART_PREFIX ="$sizes" (will send a size list from all sizes in every option --> look at "#Size list")
 + PAY_PAL_PREFIX ="$paypal" (will calculate you all paypal fees) format -->  $paypal 150€
++ COMMAND_LIST ="$commands" (will send a list of all commands)
++ URL_PREFIX ="$url" (will return all links to every marketplace site only)
 
 5. Open and run the "discord_embed" file. (best for this is VS-Code in my opinion)
 --> updated running process will be added soon.
