@@ -28,7 +28,7 @@ In the folder is the version: ChromeDriver 111.0.5563.65
 
 # How to use
 
-1. install all files and extract the zip file. --> check if you have all needed files in the folder. (main.py, embed.py, config.py, chromedriver.exe, requirements.txt)
+1. install all files and extract the zip file. --> check if you have all needed files in the folder. (main.py, embed.py, config.py, chromedriver.exe, requirements.txt, size_chart.jpg)
 
 2. install requirements.txt --> go to #requirements section to see how
 
