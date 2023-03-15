@@ -36,3 +36,9 @@ SIZE_CHART_PREFIX ="$sizes"
 #PayPal Fees Calculator:
 PAY_PAL_PREFIX ="$paypal"
 #format -->  $paypal 150€
+
+#List of all commands:
+COMMAND_LIST = "$commands"
+
+#List of all urls for a product:
+URL_PREFIX ="$url"
