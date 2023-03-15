@@ -514,7 +514,7 @@ async def on_message(message):
         embed = discord.Embed(
             title="Command List",
             url="https://twitter.com/jakobaio",
-            color=0xe74c3c
+            color=0x11806a
           )
         embed.set_author(
             name="Scraper commands",
@@ -522,7 +522,7 @@ async def on_message(message):
             icon_url= "https://i.imgur.com/mtt9JCN.png"
             )
         embed.set_thumbnail(
-            url="https://cdn.pixabay.com/photo/2013/04/01/09/21/attention-98513_960_720.png"
+            url="https://cdn-icons-png.flaticon.com/512/7546/7546214.png"
           )
         embed.add_field(
             name="Here are the commands:",
