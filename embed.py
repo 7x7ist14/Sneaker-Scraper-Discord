@@ -487,7 +487,7 @@ async def on_message(message):
 
     elif message.content.startswith(SIZE_CHART_PREFIX):
       await message.channel.send("***Size Chart:***")
-      with open('size_chart.jpg', 'rb') as f:
+      with open('nike_size_chart.png', 'rb') as f:
         file = discord.File(f)
         await message.channel.send(file=file)
         print("Size chart send!")
