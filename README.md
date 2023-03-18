@@ -13,7 +13,7 @@ Check if you have all the needed Python libraries.
 
 -->To install all needed libraries just do this:
 + open the folder that contains all files (the folder name should be "Sneaker-Scraper-Discord") in your file Explorer.
-+ click on the path and write "cmd" --> now click enter
++ click on the path and write "cmd" --> now press enter
 + you should now see a cmd window, you just have to type "pip install -r requirements.txt" 
 + all needed libraries should now be installed and your good to go :)
 
