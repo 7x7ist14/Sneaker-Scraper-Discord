@@ -90,7 +90,7 @@ Format examples:
 ![image](https://user-images.githubusercontent.com/103487648/225095242-2ccf41bd-b6e2-4811-8f46-3abb15c62231.png)
 
 # Size list:
-![image](https://user-images.githubusercontent.com/103487648/225095890-76c6c2c0-897c-4245-8a2d-69980c86bd5a.png)
+![image](https://user-images.githubusercontent.com/103487648/226125970-8bdffdd0-6a69-4ec0-a421-2457037c029d.png)
 
 # Command list:
 
