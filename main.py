@@ -1,4 +1,5 @@
 import requests
+import cloudscraper
 import json
 import time
 from bs4 import BeautifulSoup
@@ -340,8 +341,9 @@ def format_list(price_list):
 
 def sneakit_info(SKU):
   try:
+    scraper = cloudscraper.create_scraper()
     sneakit_url_r = sneakit_url(SKU)
-    r = requests.get(sneakit_url_r)
+    r = scraper.get(sneakit_url_r)
     global output
     output = json.loads(r.text)
     print("Scraped Sneakit info!")
