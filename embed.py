@@ -8,7 +8,7 @@ restocks_product_url = main.restocks_product_url
 stockx_product_url = main.stockx_product_url
 sneakit_product_url = main.sneakit_product_url
 hypeboost_product_url = main.hypeboost_product_url
-goat_url = main.goat_url
+goat_url = main.product_url_goat
 product_title = main.product_title
 product_img = main.restocks_product_img
 restocks_stock = main.restocks_stock
@@ -19,11 +19,14 @@ hypeboost_prices_payout = main.hypeboost_prices_payout
 paypal_fees_price = main.paypal_fees
 paypal_fees_only = main.paypal_fees_2
 paypal_fees_to_price = main.paypal_fees_3
+goat_product_img = main.product_img_goat
+goat_prodcut_title = main.product_title_goat
+goat_sizes_prices = main.product_sizes_goat
 
 required_variables = ['TOKEN', 'CHANNEL_NAME', 'COMMAND_PREFIX_ALL', 'COMMAND_PREFIX_RESTOCKS',
                       'COMMAND_PREFIX_HYPEBOOST', 'COMMAND_PREFIX_SNEAKIT', 'COMMAND_PREFIX_RESTOCKS_PAYOUT',
                       'COMMAND_PREFIX_HYPEBOOST_PAYOUT', 'COMMAND_PREFIX_PAYOUT_ALL', 'SIZE_CHART_PREFIX',
-                      'PAY_PAL_PREFIX', 'COMMAND_LIST', 'URL_PREFIX']
+                      'PAY_PAL_PREFIX', 'COMMAND_LIST', 'URL_PREFIX', 'COMMAND_PREFIX_GOAT']
 
 for variable in required_variables:
     if not globals().get(variable):
@@ -61,6 +64,7 @@ async def on_message(message):
         restocks_stock_output = restocks_stock(SKU)
         hypeboost_stock_output = hypeboost_stock(SKU)
         sneakit_stock_output = sneakit_stock(SKU)
+        goat_stock_output = goat_sizes_prices(SKU)
 
         embed = discord.Embed(
           title=product_title_output,
@@ -91,6 +95,11 @@ async def on_message(message):
           inline=True
         )
         embed.add_field(
+          name="GOAT Prices:",
+          value=goat_stock_output,
+          inline=True
+        )
+        embed.add_field(
           name="Open Product on:",
           value=f"[[StockX]]({stockx_product_url_output})      " f"[[Sneakit]]({sneakit_product_url_output})      " f"[[Restocks]]({restocks_product_url_output})      " f"[[Hypeboost]]({hypeboost_product_url_output})      " f"[[GOAT]]({goat_url_output})      ",
           inline=False
@@ -101,6 +110,52 @@ async def on_message(message):
 
         await message.channel.send(embed=embed)
         print('AIO Scraping Successful!')
+
+    elif message.content.startswith(COMMAND_PREFIX_GOAT):
+      await message.channel.send("Scraping GOAT...")
+
+      if COMMAND_PREFIX_GOAT in message_content:
+        SKU_raw = message_content.replace(COMMAND_PREFIX_GOAT, '')
+        SKU = SKU_raw.replace(" ", "")
+
+        product_title_output = goat_prodcut_title(SKU)
+        product_img_output = goat_product_img(SKU)
+        hypeboost_product_url_output = hypeboost_product_url(SKU)
+        restocks_product_url_output = restocks_product_url(SKU)
+        stockx_product_url_output = stockx_product_url(SKU)
+        sneakit_product_url_output = sneakit_product_url(SKU)
+        goat_url_output = goat_url(SKU)
+        goat_product_output = goat_sizes_prices(SKU)
+
+        embed = discord.Embed(
+          title=product_title_output,
+          url=goat_url_output,
+          color=0x11806a
+        )
+        embed.set_author(
+          name="GOAT Scraper",
+          url="https://twitter.com/jakobaio",
+          icon_url= "https://play-lh.googleusercontent.com/XSe2IZfyHjzRL0qSqTOuA4zgr-Ha6oiCMGcOlOvPqcKVaeLIhBNmU3BoUzyIfEISUZQ=w240-h480-rw"
+        )
+        embed.set_thumbnail(
+          url=product_img_output
+        )
+        embed.add_field(
+          name="GOAT Prices:",
+          value=goat_product_output,
+          inline=True
+        )
+        embed.add_field(
+          name="Open Product on:",
+          value=f"[[StockX]]({stockx_product_url_output})      " f"[[GOAT]]({goat_url_output})      " f"[[Restocks]]({restocks_product_url_output})      " f"[[Hypeboost]]({hypeboost_product_url_output})      " f"[[Sneakit]]({sneakit_product_url_output})      ",
+          inline=False
+        )
+        embed.set_footer(
+          text=f"Developed by JakobAIO      |      GOAT.com Scraper      |      {datetime.datetime.now().strftime('%H:%M:%S')}"
+        )
+
+        await message.channel.send(embed=embed)
+        print('GOAT Scraping Successful!')
 
     elif message.content.startswith(PAY_PAL_PREFIX):
       await message.channel.send("Scraping PayPal fees...")
@@ -496,6 +551,7 @@ async def on_message(message):
       if COMMAND_LIST in message_content:
         prefixes = {
             "AIO Scraper": COMMAND_PREFIX_ALL,
+            "GOAT Scraper": COMMAND_PREFIX_GOAT,
             "Restocks-Scraper": COMMAND_PREFIX_RESTOCKS,
             "Hypeboost-Scraper": COMMAND_PREFIX_HYPEBOOST,
             "Sneakit-Scraper": COMMAND_PREFIX_SNEAKIT,
@@ -545,6 +601,7 @@ async def on_message(message):
       print("False command used!")
       prefixes = {
           "AIO Scraper": COMMAND_PREFIX_ALL,
+          "GOAT Scraper": COMMAND_PREFIX_GOAT,
           "Restocks-Scraper": COMMAND_PREFIX_RESTOCKS,
           "Hypeboost-Scraper": COMMAND_PREFIX_HYPEBOOST,
           "Sneakit-Scraper": COMMAND_PREFIX_SNEAKIT,
