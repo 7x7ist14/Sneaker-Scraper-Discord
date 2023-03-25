@@ -80,35 +80,6 @@ def hypeboost_product_url(SKU):
     except:
       return("https://hypeboost.com/de")
 
-def goat_url(SKU):
-  try:
-    url = "https://ac.cnstrc.com/search/" + SKU
-    querystring = {"c":"ciojs-client-2.29.12","key":"key_XT7bjdbvjgECO5d8","i":"f8b0a5f2-bc6b-4626-b980-74bbc3b45edf","s":"1","num_results_per_page":"25","_dt":"1678011980760"}
-
-    payload = ""
-    headers = {
-        "authority": "ac.cnstrc.com",
-        "accept": "*/*",
-        "accept-language": "en-DE,en;q=0.9",
-        "origin": "https://www.goat.com",
-        "sec-ch-ua": "^\^Chromium^^;v=^\^110^^, ^\^Not",
-        "sec-ch-ua-mobile": "?0",
-        "sec-ch-ua-platform": "^\^Windows^^",
-        "sec-fetch-dest": "empty",
-        "sec-fetch-mode": "cors",
-        "sec-fetch-site": "cross-site",
-        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36"
-    }
-
-    response = requests.request("GET", url, data=payload, headers=headers, params=querystring)
-    output = json.loads(response.text)
-    output_slug = output['response']['results'][0]['data']['slug']
-    product_url = "https://www.goat.com/sneakers/" + output_slug
-    print("Scraped GOAT product URL!")
-    return product_url
-  except:
-    return("https://www.goat.com/")
-
 def product_title(SKU):
   try:
     product_url = restocks_product_url(SKU)
@@ -392,3 +363,97 @@ def paypal_fees_3(price):
   except:
     return ("something went wrong!")
 
+def product_info_url_goat(SKU):
+    try:
+        product_id_url = f"https://ac.cnstrc.com/search/{SKU}?c=ciojs-client-2.29.12&key=key_XT7bjdbvjgECO5d8&i=5c1db6a2-7a42-4cbd-9606-96a08face508&s=23&num_results_per_page=25&_dt=1679422941544"
+        scraper = cloudscraper.create_scraper()
+        request = scraper.get(product_id_url)
+        json_product = json.loads(request.text)
+        ID = json_product['response']['results'][0]['data']['id']
+        base_url = "https://www.goat.com/web-api/v1/product_variants/buy_bar_data?productTemplateId="
+        request_url = base_url + ID + "&countryCode=EU"
+        print("Scraped GOAT URL!")
+        return request_url
+    except:
+        return ("https://www.goat.com/")
+
+
+
+def product_sizes_goat(SKU):
+    try:
+        request_url = product_info_url_goat(SKU)
+        scraper = cloudscraper.create_scraper()
+        request = scraper.get(request_url)
+        output = json.loads(request.text)
+
+        results = []
+        for entry in output:
+            if (entry['shoeCondition'] == "new_no_defects") and (entry['boxCondition'] == "good_condition"):
+                size = entry['sizeOption']['presentation']
+                try:
+                    price_cents = entry['lowestPriceCents']['amount']
+                except KeyError:
+                    price_cents = 'OOS!'
+                results.append((size, price_cents))
+
+        results2 = []
+        for entry in output:
+            if (entry['shoeCondition'] == "new_no_defects") and (entry['boxCondition'] == "good_condition"):
+                size = entry['sizeOption']['presentation']
+                try:
+                    price_cents = entry['lowestPriceCents']['amount'] / 100
+                    price_euro1 = price_cents - 1
+                    price_euro = str(price_euro1) + "€"
+                except KeyError:
+                    price_euro = 'OOS!'
+                results2.append((size, price_euro))
+
+        prices = [(size, price.replace('.0', '')) for size, price in results2]
+        output_str = ""
+        for element in prices:
+            output_str += f"{element[0]} : {element[1]}\n"
+
+        print("Scraped GOAT prices!")
+        return output_str
+    except:
+        return ("Product not found!")
+
+
+def product_img_goat(SKU):
+    try:
+        url = f"https://ac.cnstrc.com/search/{SKU}?c=ciojs-client-2.29.12&key=key_XT7bjdbvjgECO5d8&i=5c1db6a2-7a42-4cbd-9606-96a08face508&s=23&num_results_per_page=25&_dt=1679422941544"
+        scraper = cloudscraper.create_scraper()
+        request = scraper.get(url)
+        json_product = json.loads(request.text)
+        img = json_product['response']['results'][0]['data']['image_url']
+        print("Scraped GOAT product picture!")
+        return img
+    except:
+        return ("https://www.freecodecamp.org/news/content/images/2021/03/ykhg3yuzq8931--1-.png")
+
+
+def product_title_goat(SKU):
+    try:
+        url = f"https://ac.cnstrc.com/search/{SKU}?c=ciojs-client-2.29.12&key=key_XT7bjdbvjgECO5d8&i=5c1db6a2-7a42-4cbd-9606-96a08face508&s=23&num_results_per_page=25&_dt=1679422941544"
+        scraper = cloudscraper.create_scraper()
+        request = scraper.get(url)
+        json_product = json.loads(request.text)
+        title = json_product['response']['results'][0]['value']
+        print("Scraped GOAT product title!")
+        return title
+    except:
+        return ("Title not found!")
+
+def product_url_goat(SKU):
+    try:
+        base_url = "https://www.goat.com/sneakers/"
+        url = f"https://ac.cnstrc.com/search/{SKU}?c=ciojs-client-2.29.12&key=key_XT7bjdbvjgECO5d8&i=5c1db6a2-7a42-4cbd-9606-96a08face508&s=23&num_results_per_page=25&_dt=1679422941544"
+        scraper = cloudscraper.create_scraper()
+        request = scraper.get(url)
+        json_product = json.loads(request.text)
+        slug = json_product['response']['results'][0]['data']['slug']
+        product_url = base_url + slug
+        print("Scraped GOAT product url: " + product_url)
+        return product_url
+    except:
+        return("https://www.goat.com/")
