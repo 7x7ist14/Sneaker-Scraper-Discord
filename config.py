@@ -1,6 +1,6 @@
 
 #Input your Discord-Bot token here:
-TOKEN = ''
+TOKEN = 'MTA3ODQwMjA4OTY3MzI5NzkyMA.GuJ7-c.Y8dhCVWcmGm4qBL7-zMwDxQ5b29oNLXTRx3od4'
 
 #Input the Name of the discord channel here (channel name not server name!):
 CHANNEL_NAME = 'scraper'
@@ -17,6 +17,9 @@ COMMAND_PREFIX_RESTOCKS = "$restocks"
 
 #Listing prices Hypeboost only:
 COMMAND_PREFIX_HYPEBOOST = "$hypeboost"
+
+#Listing prices GOAT only:
+COMMAND_PREFIX_GOAT = "$goat"
 
 #Listing prices Sneakit only:
 COMMAND_PREFIX_SNEAKIT = "$sneakit"
@@ -37,8 +40,6 @@ SIZE_CHART_PREFIX ="$sizes"
 PAY_PAL_PREFIX ="$paypal"
 #format -->  $paypal 150€
 
-#List of all commands:
 COMMAND_LIST = "$commands"
 
-#List of all urls for a product:
 URL_PREFIX ="$url"
