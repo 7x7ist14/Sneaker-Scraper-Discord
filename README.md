@@ -5,6 +5,7 @@ Supported sites are:
 + Restocks --> Payout and listed prices
 + Hypeboost --> Payout and listed prices
 + Sneakit --> listed prices
++ GOAT --> listed prices 
 
 
 # Requirements:
@@ -40,6 +41,7 @@ In the folder is the version: ChromeDriver 111.0.5563.65
 + COMMAND_PREFIX_ALL = "$scrape"    (Scraper for all sites at the same time --> only listing prices)
 + COMMAND_PREFIX_RESTOCKS = "$restocks" (Scraper for Restocks only --> listing prices only)
 + COMMAND_PREFIX_HYPEBOOST = "$hypeboost" (Scraper for Hypeboost only --> listing prices only)
++ COMMAND_PREFIX_GOAT = "$goat" (Scraper for GOAT only --> listing prices only)
 + COMMAND_PREFIX_SNEAKIT = "$sneakit" (Scraper for Sneakit only --> listing prices only)
 + COMMAND_PREFIX_PAYOUT_ALL = "$payout" (Scraper for all sites at the same time --> only payout prices)
 + COMMAND_PREFIX_RESTOCKS_PAYOUT = "$r" (Scraper for Restocks only --> payout prices only)
