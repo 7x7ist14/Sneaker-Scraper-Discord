@@ -1,6 +1,6 @@
 
 #Input your Discord-Bot token here:
-TOKEN = 'MTA3ODQwMjA4OTY3MzI5NzkyMA.GuJ7-c.Y8dhCVWcmGm4qBL7-zMwDxQ5b29oNLXTRx3od4'
+TOKEN = ''
 
 #Input the Name of the discord channel here (channel name not server name!):
 CHANNEL_NAME = 'scraper'
