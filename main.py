@@ -1,459 +1,651 @@
-import requests
-import cloudscraper
-import json
-import time
-from bs4 import BeautifulSoup
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.chrome.options import Options
+import discord
+import main
+import datetime
+from discord.ext import commands
+from config import *
+
+restocks_product_url = main.restocks_product_url
+stockx_product_url = main.stockx_product_url
+sneakit_product_url = main.sneakit_product_url
+hypeboost_product_url = main.hypeboost_product_url
+goat_url = main.product_url_goat
+product_title = main.product_title
+product_img = main.restocks_product_img
+restocks_stock = main.restocks_stock
+hypeboost_stock = main.hypeboost_stock
+sneakit_stock = main.sneakit_stock
+restocks_stock_payout = main.restocks_stock_payout
+hypeboost_prices_payout = main.hypeboost_prices_payout
+paypal_fees_price = main.paypal_fees
+paypal_fees_only = main.paypal_fees_2
+paypal_fees_to_price = main.paypal_fees_3
+goat_product_img = main.product_img_goat
+goat_prodcut_title = main.product_title_goat
+goat_sizes_prices = main.product_sizes_goat
+
+required_variables = ['TOKEN', 'CHANNEL_NAME', 'COMMAND_PREFIX_ALL', 'COMMAND_PREFIX_RESTOCKS',
+                      'COMMAND_PREFIX_HYPEBOOST', 'COMMAND_PREFIX_SNEAKIT', 'COMMAND_PREFIX_RESTOCKS_PAYOUT',
+                      'COMMAND_PREFIX_HYPEBOOST_PAYOUT', 'COMMAND_PREFIX_PAYOUT_ALL', 'SIZE_CHART_PREFIX',
+                      'PAY_PAL_PREFIX', 'COMMAND_LIST', 'URL_PREFIX', 'COMMAND_PREFIX_GOAT']
+
+for variable in required_variables:
+    if not globals().get(variable):
+        raise ValueError(f"The {variable} was not included in the config.py file")
+
+bot = commands.Bot(command_prefix=COMMAND_PREFIX_ALL, intents=discord.Intents.all())
+
+@bot.event
+async def on_ready():
+    await bot.change_presence(status=discord.Status.online, activity=discord.Game('Sneaker Scraper!'))
+    print("Bot logged in!")
 
 
-def restocks_product_url(SKU):
-  try:
-    base_url = 'https://restocks.net/de/shop/search?q='
-    request_url = base_url + SKU + '&page=1&filters[0][range][price][gte]=1'
+@bot.event
+async def on_message(message):
+  if message.author == bot.user:
+      return
+  message_content = message.content.lower()
 
-    r = requests.get(request_url)
+  if message.channel.name == CHANNEL_NAME:
+    if message.content.startswith(COMMAND_PREFIX_ALL):
+      await message.channel.send("Scraping AIO...")
 
-    json_restocks = json.loads(r.text)
-    product_url = json_restocks["data"][0]['slug']
-    print('Scraped Restocks URL: ' + product_url)
-    return product_url
-  except:
-    return("https://restocks.net/de")
+      if COMMAND_PREFIX_ALL in message_content:
+        SKU_raw = message_content.replace(COMMAND_PREFIX_ALL, '')
+        SKU = SKU_raw.replace(" ", "")
 
-def stockx_product_url(SKU):
-  try:
-    url = "https://stockx.com/api/browse?_search=" + SKU
+        product_title_output = product_title(SKU)
+        product_img_output = product_img(SKU,restocks_product_url)
+        hypeboost_product_url_output = hypeboost_product_url(SKU)
+        restocks_product_url_output = restocks_product_url(SKU)
+        stockx_product_url_output = stockx_product_url(SKU)
+        sneakit_product_url_output = sneakit_product_url(SKU)
+        goat_url_output = goat_url(SKU)
+        restocks_stock_output = restocks_stock(SKU)
+        hypeboost_stock_output = hypeboost_stock(SKU)
+        sneakit_stock_output = sneakit_stock(SKU)
+        goat_stock_output = goat_sizes_prices(SKU)
 
-    headers = {
-            'accept': 'application/json',
-            'accept-encoding': 'utf-8',
-            'accept-language': 'en-DE',
-            'app-platform': 'Iron',
-            'referer': 'https://stockx.com/en-DE',
-            'sec-ch-ua': '" Not A;Brand";v="99", "Chromium";v="102", "Google Chrome";v="102"',
-            'sec-ch-ua-mobile': '?0',
-            'sec-ch-ua-platform': '"Windows"',
-            'sec-fetch-dest': 'empty',
-            'sec-fetch-mode': 'cors',
-            'sec-fetch-site': 'same-origin',
-            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
-            'x-requested-with': 'XMLHttpRequest'
+        embed = discord.Embed(
+          title=product_title_output,
+          url=hypeboost_product_url_output,
+          color=0xf1c40f
+        )
+        embed.set_author(
+          name="AIO Scraper",
+          url="https://twitter.com/jakobaio",
+          icon_url= "https://i.imgur.com/mtt9JCN.png"
+        )
+        embed.set_thumbnail(
+          url=product_img_output
+        )
+        embed.add_field(
+          name="Hypeboost Prices:",
+          value=hypeboost_stock_output,
+          inline=True
+        )
+        embed.add_field(
+          name="Restocks Prices:",
+          value=restocks_stock_output,
+          inline=True
+        )
+        embed.add_field(
+          name="Sneakit Prices:",
+          value=sneakit_stock_output,
+          inline=True
+        )
+        '''
+        embed.add_field(
+          name="GOAT Prices:",
+          value=goat_stock_output,
+          inline=True
+        )
+        '''
+        embed.add_field(
+          name="Open Product on:",
+          value=f"[[StockX]]({stockx_product_url_output})      " f"[[Sneakit]]({sneakit_product_url_output})      " f"[[Restocks]]({restocks_product_url_output})      " f"[[Hypeboost]]({hypeboost_product_url_output})      " f"[[GOAT]]({goat_url_output})      ",
+          inline=False
+        )
+        embed.set_footer(
+          text=f"Developed by JakobAIO      |      AIO Scraper      |      {datetime.datetime.now().strftime('%H:%M:%S')}"
+        )
+
+        await message.channel.send(embed=embed)
+        print('AIO Scraping Successful!')
+
+    elif message.content.startswith(COMMAND_PREFIX_GOAT):
+      await message.channel.send("Scraping GOAT...")
+
+      if COMMAND_PREFIX_GOAT in message_content:
+        SKU_raw = message_content.replace(COMMAND_PREFIX_GOAT, '')
+        SKU = SKU_raw.replace(" ", "")
+
+        product_title_output = goat_prodcut_title(SKU)
+        product_img_output = goat_product_img(SKU)
+        hypeboost_product_url_output = hypeboost_product_url(SKU)
+        restocks_product_url_output = restocks_product_url(SKU)
+        stockx_product_url_output = stockx_product_url(SKU)
+        sneakit_product_url_output = sneakit_product_url(SKU)
+        goat_url_output = goat_url(SKU)
+        goat_product_output = goat_sizes_prices(SKU)
+
+        embed = discord.Embed(
+          title=product_title_output,
+          url=goat_url_output,
+          color=0x11806a
+        )
+        embed.set_author(
+          name="GOAT Scraper",
+          url="https://twitter.com/jakobaio",
+          icon_url= "https://play-lh.googleusercontent.com/XSe2IZfyHjzRL0qSqTOuA4zgr-Ha6oiCMGcOlOvPqcKVaeLIhBNmU3BoUzyIfEISUZQ=w240-h480-rw"
+        )
+        embed.set_thumbnail(
+          url=product_img_output
+        )
+        embed.add_field(
+          name="GOAT Prices:",
+          value=goat_product_output,
+          inline=True
+        )
+        embed.add_field(
+          name="Open Product on:",
+          value=f"[[StockX]]({stockx_product_url_output})      " f"[[GOAT]]({goat_url_output})      " f"[[Restocks]]({restocks_product_url_output})      " f"[[Hypeboost]]({hypeboost_product_url_output})      " f"[[Sneakit]]({sneakit_product_url_output})      ",
+          inline=False
+        )
+        embed.set_footer(
+          text=f"Developed by JakobAIO      |      GOAT.com Scraper      |      {datetime.datetime.now().strftime('%H:%M:%S')}"
+        )
+
+        await message.channel.send(embed=embed)
+        print('GOAT Scraping Successful!')
+
+    elif message.content.startswith(PAY_PAL_PREFIX):
+      await message.channel.send("Scraping PayPal fees...")
+
+      if PAY_PAL_PREFIX in message_content:
+        price_raw = message_content.replace(PAY_PAL_PREFIX, '')
+        price_raw1 = price_raw.replace("€", "")
+        price = price_raw1
+        paypal_fees_price_output = paypal_fees_price(price)
+        paypal_fees_only_output = paypal_fees_only(price)
+        paypal_fees_to_price_output = paypal_fees_to_price(price)
+        embed = discord.Embed(
+          title="PayPal fees",
+          url="https://www.paypal.com/de/home",
+          color=0x3498db
+        )
+        embed.set_author(
+          name="PayPal",
+          url="https://twitter.com/jakobaio",
+          icon_url= "https://cdn-icons-png.flaticon.com/512/2504/2504802.png"
+          )
+        embed.set_thumbnail(
+          url="https://cdn-icons-png.flaticon.com/512/888/888871.png"
+        )
+        embed.add_field(
+          name="Your input amount:",
+          value=price + "€",
+          inline=False
+        )
+        embed.add_field(
+          name="PayPal fees:",
+          value=paypal_fees_only_output,
+          inline=True
+        )
+        embed.add_field(
+          name="Price after fees:",
+          value=paypal_fees_price_output,
+          inline=False
+        )
+        embed.add_field(
+          name="PayPal fees added:",
+          value=paypal_fees_to_price_output,
+          inline=True
+        )
+        embed.set_footer(
+          text=f"Developed by JakobAIO      |      PayPal Fees Calculator      |      {datetime.datetime.now().strftime('%H:%M:%S')}"
+        )
+        await message.channel.send(embed=embed)
+        print('PayPal Fees Scraping Successful!')
+
+    elif message.content.startswith(URL_PREFIX):
+      await message.channel.send("Scraping product URL's...")
+
+      if URL_PREFIX in message_content:
+        SKU_raw = message_content.replace(URL_PREFIX, '')
+        SKU = SKU_raw.replace(" ", "")
+        hypeboost_product_url_output = hypeboost_product_url(SKU)
+        restocks_product_url_output = restocks_product_url(SKU)
+        stockx_product_url_output = stockx_product_url(SKU)
+        sneakit_product_url_output = sneakit_product_url(SKU)
+        goat_url_output = goat_url(SKU)
+        product_title_output = product_title(SKU)
+        product_img_output = product_img(SKU,restocks_product_url)
+        embed = discord.Embed(
+          title=product_title_output,
+          url="https://twitter.com/jakobaio",
+          color=0x95a5a6
+        )
+        embed.set_author(
+          name="URL Scraper",
+          url="https://twitter.com/jakobaio",
+          icon_url= "https://cdn.pixabay.com/photo/2016/03/21/23/25/link-1271843_960_720.png"
+          )
+        embed.set_thumbnail(
+          url=product_img_output
+        )
+        embed.add_field(
+          name="",
+          value=f"[[StockX]]({stockx_product_url_output})",
+          inline=False
+        )
+        embed.add_field(
+          name="",
+          value=f"[[Restocks]]({restocks_product_url_output})",
+          inline=False
+        )
+        embed.add_field(
+          name="",
+          value=f"[[GOAT]]({goat_url_output})",
+          inline=False
+        )
+        embed.add_field(
+          name="",
+          value=f"[[Hypeboost]]({hypeboost_product_url_output})",
+          inline=False
+        )
+        embed.add_field(
+          name="",
+          value=f"[[Sneakit]]({sneakit_product_url_output})",
+          inline=False
+        )
+        embed.set_footer(
+          text=f"Developed by JakobAIO      |      PayPal Fees Calculator      |      {datetime.datetime.now().strftime('%H:%M:%S')}"
+        )
+        await message.channel.send(embed=embed)
+        print('Scraped URLs')
+
+    elif message.content.startswith(COMMAND_PREFIX_RESTOCKS):
+      await message.channel.send("Scraping Restocks...")
+
+      if COMMAND_PREFIX_RESTOCKS in message_content:
+        SKU_raw = message_content.replace(COMMAND_PREFIX_RESTOCKS, '')
+        SKU = SKU_raw.replace(" ", "")
+        product_title_output = product_title(SKU)
+        product_img_output = product_img(SKU,restocks_product_url)
+        hypeboost_product_url_output = hypeboost_product_url(SKU)
+        restocks_product_url_output = restocks_product_url(SKU)
+        stockx_product_url_output = stockx_product_url(SKU)
+        sneakit_product_url_output = sneakit_product_url(SKU)
+        goat_url_output = goat_url(SKU)
+        restocks_stock_output = restocks_stock(SKU)
+
+        embed = discord.Embed(
+          title=product_title_output,
+          url=restocks_product_url_output,
+          color=0x546e7a
+        )
+        embed.set_author(
+          name="Restocks Scraper",
+          url="https://twitter.com/jakobaio",
+          icon_url= "https://www.reklamation24.de/img/content/marken/original_6710_1.gif"
+          )
+        embed.set_thumbnail(
+          url=product_img_output
+        )
+        embed.add_field(
+          name="Restocks Prices:",
+          value=restocks_stock_output,
+          inline=True
+        )
+        embed.add_field(
+          name="Open Product on:",
+          value=f"[[StockX]]({stockx_product_url_output})      " f"[[Sneakit]]({sneakit_product_url_output})      " f"[[Restocks]]({restocks_product_url_output})      " f"[[Hypeboost]]({hypeboost_product_url_output})      " f"[[GOAT]]({goat_url_output})      ",
+          inline=False
+        )
+        embed.set_footer(
+          text=f"Developed by JakobAIO      |      Restocks.net Scraper      |      {datetime.datetime.now().strftime('%H:%M:%S')}"
+        )
+
+        await message.channel.send(embed=embed)
+        print('Restocks Scraping Successful!')
+
+    elif message.content.startswith(COMMAND_PREFIX_HYPEBOOST):
+      await message.channel.send("Scraping Hypeboost...")
+
+      if COMMAND_PREFIX_HYPEBOOST in message_content:
+        SKU_raw = message_content.replace(COMMAND_PREFIX_HYPEBOOST, '')
+        SKU = SKU_raw.replace(" ", "")
+        product_title_output = product_title(SKU)
+        product_img_output = product_img(SKU,restocks_product_url)
+        hypeboost_product_url_output = hypeboost_product_url(SKU)
+        restocks_product_url_output = restocks_product_url(SKU)
+        stockx_product_url_output = stockx_product_url(SKU)
+        sneakit_product_url_output = sneakit_product_url(SKU)
+        goat_url_output = goat_url(SKU)
+        hypeboost_stock_output = hypeboost_stock(SKU)
+
+        embed = discord.Embed(
+          title=product_title_output,
+          url=hypeboost_product_url_output,
+          color=0x206694
+        )
+        embed.set_author(
+          name="Hypeboost Scraper",
+          url="https://twitter.com/jakobaio",
+          icon_url= "https://consumersiteimages.trustpilot.net/business-units/610a587f2b259a001d8d9b5f-198x149-1x.jpg"
+        )
+        embed.set_thumbnail(
+          url=product_img_output
+        )
+        embed.add_field(
+          name="Hypeboost Prices:",
+          value=hypeboost_stock_output,
+          inline=True
+        )
+        embed.add_field(
+          name="Open Product on:",
+          value=f"[[StockX]]({stockx_product_url_output})      " f"[[Sneakit]]({sneakit_product_url_output})      " f"[[Restocks]]({restocks_product_url_output})      " f"[[Hypeboost]]({hypeboost_product_url_output})      " f"[[GOAT]]({goat_url_output})      ",
+          inline=False
+        )
+        embed.set_footer(
+          text=f"Developed by JakobAIO      |      Hypeboost.com Scraper      |      {datetime.datetime.now().strftime('%H:%M:%S')}"
+        )
+
+        await message.channel.send(embed=embed)
+        print('Hypeboost Scraping Successful!')
+
+    elif message.content.startswith(COMMAND_PREFIX_SNEAKIT):
+      await message.channel.send("Scraping Sneakit...")
+
+      if COMMAND_PREFIX_SNEAKIT in message_content:
+        SKU_raw = message_content.replace(COMMAND_PREFIX_SNEAKIT, '')
+        SKU = SKU_raw.replace(" ", "")
+        product_title_output = product_title(SKU)
+        product_img_output = product_img(SKU,restocks_product_url)
+        hypeboost_product_url_output = hypeboost_product_url(SKU)
+        restocks_product_url_output = restocks_product_url(SKU)
+        stockx_product_url_output = stockx_product_url(SKU)
+        sneakit_product_url_output = sneakit_product_url(SKU)
+        goat_url_output = goat_url(SKU)
+        sneakit_stock_output = hypeboost_stock(SKU)
+
+        embed = discord.Embed(
+          title=product_title_output,
+          url=sneakit_product_url_output,
+          color=0x95a5a6
+        )
+        embed.set_author(
+          name="Sneakit Scraper",
+          url="https://twitter.com/jakobaio",
+          icon_url= "https://consumersiteimages.trustpilot.net/business-units/630e4bd7744ce9c5e2e2fc4e-198x149-1x.jpg"
+        )
+        embed.set_thumbnail(
+          url=product_img_output
+        )
+        embed.add_field(
+          name="Sneakit Prices:",
+          value=sneakit_stock_output,
+          inline=True
+        )
+        embed.add_field(
+          name="Open Product on:",
+          value=f"[[StockX]]({stockx_product_url_output})      " f"[[Sneakit]]({sneakit_product_url_output})      " f"[[Restocks]]({restocks_product_url_output})      " f"[[Hypeboost]]({hypeboost_product_url_output})      " f"[[GOAT]]({goat_url_output})      ",
+          inline=False
+        )
+        embed.set_footer(
+          text=f"Developed by JakobAIO      |      Sneakit.com Scraper      |      {datetime.datetime.now().strftime('%H:%M:%S')}"
+        )
+
+        await message.channel.send(embed=embed)
+        print('Sneakit Scraping Successful!')
+
+    elif message.content.startswith(COMMAND_PREFIX_PAYOUT_ALL):
+      await message.channel.send("Scraping Payout AIO...")
+
+      if COMMAND_PREFIX_PAYOUT_ALL in message_content:
+        SKU_raw = message_content.replace(COMMAND_PREFIX_PAYOUT_ALL, '')
+        SKU = SKU_raw.replace(" ", "")
+
+        product_title_output = product_title(SKU)
+        product_img_output = product_img(SKU,restocks_product_url)
+        hypeboost_product_url_output = hypeboost_product_url(SKU)
+        restocks_product_url_output = restocks_product_url(SKU)
+        stockx_product_url_output = stockx_product_url(SKU)
+        sneakit_product_url_output = sneakit_product_url(SKU)
+        goat_url_output = goat_url(SKU)
+        hypeboost_prices_payout_output = hypeboost_prices_payout(SKU)
+        restocks_prices_payout_output = restocks_stock_payout(SKU)
+
+        embed = discord.Embed(
+          title=product_title_output,
+          url=hypeboost_product_url_output,
+          color=0x7289da
+        )
+        embed.set_author(
+          name="Payout AIO Scraper",
+          url="https://twitter.com/jakobaio",
+          icon_url= "https://i.imgur.com/mtt9JCN.png"
+        )
+        embed.set_thumbnail(
+          url=product_img_output
+        )
+        embed.add_field(
+          name="Hypeboost Payout Prices:",
+          value=hypeboost_prices_payout_output,
+          inline=True
+        )
+        embed.add_field(
+          name="Restocks Payout Prices:",
+          value=restocks_prices_payout_output,
+          inline=True
+        )
+        embed.add_field(
+          name="Open Product on:",
+          value=f"[[StockX]]({stockx_product_url_output})      " f"[[Sneakit]]({sneakit_product_url_output})      " f"[[Restocks]]({restocks_product_url_output})      " f"[[Hypeboost]]({hypeboost_product_url_output})      " f"[[GOAT]]({goat_url_output})      ",
+          inline=False
+        )
+        embed.set_footer(
+          text=f"Developed by JakobAIO      |      Payout AIO Scraper      |      {datetime.datetime.now().strftime('%H:%M:%S')}"
+        )
+
+        await message.channel.send(embed=embed)
+        print('Payout AIO Scraping Successful!')
+
+    elif message.content.startswith(COMMAND_PREFIX_RESTOCKS_PAYOUT):
+      await message.channel.send("Scraping Restocks Payout...")
+
+      if COMMAND_PREFIX_RESTOCKS_PAYOUT in message_content:
+        SKU_raw = message_content.replace(COMMAND_PREFIX_RESTOCKS_PAYOUT, '')
+        SKU = SKU_raw.replace(" ", "")
+        product_title_output = product_title(SKU)
+        product_img_output = product_img(SKU,restocks_product_url)
+        hypeboost_product_url_output = hypeboost_product_url(SKU)
+        restocks_product_url_output = restocks_product_url(SKU)
+        stockx_product_url_output = stockx_product_url(SKU)
+        sneakit_product_url_output = sneakit_product_url(SKU)
+        goat_url_output = goat_url(SKU)
+        restocks_stock_payout_output = restocks_stock_payout(SKU)
+
+        embed = discord.Embed(
+          title=product_title_output,
+          url=restocks_product_url_output,
+          color=0x607d8b
+        )
+        embed.set_author(
+          name="Restocks Payout Scraper",
+          url="https://twitter.com/jakobaio",
+          icon_url= "https://www.reklamation24.de/img/content/marken/original_6710_1.gif"
+        )
+        embed.set_thumbnail(
+          url=product_img_output
+        )
+        embed.add_field(
+          name="Restocks Payout Prices:",
+          value=restocks_stock_payout_output,
+          inline=True
+        )
+        embed.add_field(
+          name="Open Product on:",
+          value=f"[[StockX]]({stockx_product_url_output})      " f"[[Sneakit]]({sneakit_product_url_output})      " f"[[Restocks]]({restocks_product_url_output})      " f"[[Hypeboost]]({hypeboost_product_url_output})      " f"[[GOAT]]({goat_url_output})      ",
+          inline=False
+        )
+        embed.set_footer(
+          text=f"Developed by JakobAIO      |      Restocks Payout Scraper      |      {datetime.datetime.now().strftime('%H:%M:%S')}"
+        )
+
+        await message.channel.send(embed=embed)
+        print('Restocks Payout Scraping Successful!')
+
+    elif message.content.startswith(COMMAND_PREFIX_HYPEBOOST_PAYOUT):
+      await message.channel.send("Scraping Hypeboost Payout...")
+
+      if COMMAND_PREFIX_HYPEBOOST_PAYOUT in message_content:
+        SKU_raw = message_content.replace(COMMAND_PREFIX_HYPEBOOST_PAYOUT, '')
+        SKU = SKU_raw.replace(" ", "")
+        product_title_output = product_title(SKU)
+        product_img_output = product_img(SKU,restocks_product_url)
+        hypeboost_product_url_output = hypeboost_product_url(SKU)
+        restocks_product_url_output = restocks_product_url(SKU)
+        stockx_product_url_output = stockx_product_url(SKU)
+        sneakit_product_url_output = sneakit_product_url(SKU)
+        goat_url_output = goat_url(SKU)
+        hypeboost_prices_payout_output = hypeboost_prices_payout(SKU)
+
+        embed = discord.Embed(
+          title=product_title_output,
+          url=hypeboost_product_url_output,
+          color=0x206694
+        )
+        embed.set_author(
+          name="Hypeboost Payout Scraper",
+          url="https://twitter.com/jakobaio",
+          icon_url= "https://consumersiteimages.trustpilot.net/business-units/610a587f2b259a001d8d9b5f-198x149-1x.jpg"
+          )
+        embed.set_thumbnail(
+          url=product_img_output
+        )
+        embed.add_field(
+          name="Hypeboost Payout Prices:",
+          value=hypeboost_prices_payout_output,
+          inline=True
+        )
+        embed.add_field(
+          name="Open Product on:",
+          value=f"[[StockX]]({stockx_product_url_output})      " f"[[Sneakit]]({sneakit_product_url_output})      " f"[[Restocks]]({restocks_product_url_output})      " f"[[Hypeboost]]({hypeboost_product_url_output})      " f"[[GOAT]]({goat_url_output})      ",
+          inline=False
+        )
+        embed.set_footer(
+          text=f"Developed by JakobAIO      |      Hypeboost Payout Scraper      |      {datetime.datetime.now().strftime('%H:%M:%S')}"
+        )
+
+        await message.channel.send(embed=embed)
+        print('Hypeboost Payout Scraping Successful!')
+
+    elif message.content.startswith(SIZE_CHART_PREFIX):
+      await message.channel.send("***Size Chart:***")
+      with open('nike_size_chart.png', 'rb') as f:
+        file = discord.File(f)
+        await message.channel.send(file=file)
+        print("Size chart send!")
+
+    elif message.content.startswith(COMMAND_LIST):
+      if COMMAND_LIST in message_content:
+        prefixes = {
+            "AIO Scraper": COMMAND_PREFIX_ALL,
+            "GOAT Scraper": COMMAND_PREFIX_GOAT,
+            "Restocks-Scraper": COMMAND_PREFIX_RESTOCKS,
+            "Hypeboost-Scraper": COMMAND_PREFIX_HYPEBOOST,
+            "Sneakit-Scraper": COMMAND_PREFIX_SNEAKIT,
+            "AIO Payout Scraper": COMMAND_PREFIX_PAYOUT_ALL,
+            "Restocks-Payout Scraper": COMMAND_PREFIX_RESTOCKS_PAYOUT,
+            "Hypeboost-Payout Scraper": COMMAND_PREFIX_HYPEBOOST_PAYOUT,
+            "Size Chart": SIZE_CHART_PREFIX,
+            "PayPal Fees Calculator": PAY_PAL_PREFIX,
+            "Command list": COMMAND_LIST,
+            "All product url's": URL_PREFIX
         }
 
-    request1 = requests.get(url=url, headers=headers)
-
-    product_id = json.loads(request1.text)
-    product_id_final = product_id['Products'][0]['id']
-
-
-    ID = product_id_final
-    url_stockX = "https://stockx.com/" + ID
-    print("Scraped StockX URL: " + url_stockX)
-    return url_stockX
-  except:
-    return("https://stockx.com/")
-
-def sneakit_product_url(SKU):
-  try:
-    raw = sneakit_info(SKU)
-    slug = raw['data'][0]['slug']
-    p_url = "https://sneakit.com/product/" + slug
-    print("Scraped Sneakit Product URL:" + p_url)
-    return p_url
-  except:
-    return("https://sneakit.com/")
-
-def hypeboost_product_url(SKU):
-    try:
-      url = "https://hypeboost.com/en/search/shop?keyword=" + SKU
-      r = requests.get(url)
-      soup = BeautifulSoup(r.content, 'html.parser')
-
-      for a in soup.find_all('a', href=True):
-        print("Scraped Hypeboost URL:", a['href'])
-
-      product_url = a['href']
-      return product_url
-    except:
-      return("https://hypeboost.com/de")
-
-def product_title(SKU):
-  try:
-    product_url = restocks_product_url(SKU)
-    r = requests.get(product_url)
-    soup = BeautifulSoup(r.content, 'html.parser')
-    title = soup.find("div", class_ = "product__title")
-    title2 = title.text
-    product_title_formated = title2.replace("\n", "")
-    print('Scraped Title!')
-    return product_title_formated
-  except:
-    return ("Product title not found!")
-
-def restocks_product_img(SKU,restocks_url):
-  try:
-    product_url = restocks_url(SKU)
-    r = requests.get(product_url)
-    soup = BeautifulSoup(r.content, 'html.parser')
-    picture = soup.find("div", class_ = "swiper-wrapper")
-    image = picture.find_all('img')[0].get('src')
-    print('Scraped Product picture!')
-    return image
-  except:
-    return ("https://www.freecodecamp.org/news/content/images/2021/03/ykhg3yuzq8931--1-.png")
-
-def restocks_stock(SKU):
-  try:
-    base_url = 'https://restocks.net/de/shop/search?q='
-    request_url = base_url + SKU + '&page=1&filters[0][range][price][gte]=1'
-
-    r = requests.get(request_url)
-
-    json_restocks = json.loads(r.text)
-    product_url = json_restocks["data"][0]['slug']
-    print('Scraped Restocks URL: ' + product_url)
-
-    options = Options()
-    options.headless = True
-    driver = webdriver.Chrome(options=options)
-    driver.get(product_url)
-    cookies = driver.find_element(by=By.ID, value='save__first__localization__button')
-    cookies.click()
-    time.sleep(2)
-
-    driver.execute_script("window.scrollBy(0,500)", "")
-
-    size_list = driver.find_element(by=By.CLASS_NAME, value='select__label')
-    size_list.click()
-    time.sleep(2)
-
-    prices = driver.find_element(by=By.CLASS_NAME, value='select__size__list').text
-    prices_replace = prices.replace(" ½", "½")
-    prices_replace2 = prices_replace.replace("Notify me", "OOS!")
-    prices_replace3 = prices_replace2.replace(" €", "€")
-    price_list = prices_replace3.split("\n")
-
-
-    price_list = [item for item in price_list if item != 'Noch 1 auf Lager' and item != 'Noch 2 auf Lager']
-
-    formatted_list = format_list(price_list)
-
-    driver.quit
-    return formatted_list
-  except:
-    return ("Product not found!")
-
-def restocks_stock_payout(SKU):
-  try:
-    base_url = 'https://restocks.net/de/shop/search?q='
-    request_url = base_url + SKU + '&page=1&filters[0][range][price][gte]=1'
-
-    r = requests.get(request_url)
-
-    json_restocks = json.loads(r.text)
-    product_url = json_restocks["data"][0]['slug']
-    print('Scraped Restocks URL: ' + product_url)
-
-    options = Options()
-    options.headless = True
-    driver = webdriver.Chrome(options=options)
-    driver.get(product_url)
-
-    cookies = driver.find_element(by=By.ID, value='save__first__localization__button')
-    cookies.click()
-    time.sleep(2)
-
-    driver.execute_script("window.scrollBy(0,500)", "")
-
-    size_list = driver.find_element(by=By.CLASS_NAME, value='select__label')
-    size_list.click()
-    time.sleep(2)
-
-    prices = driver.find_element(by=By.CLASS_NAME, value='select__size__list').text
-    prices_replace = prices.replace(" ½", ".5")
-    prices_replace2 = prices_replace.replace("Notify me", "OOS")
-    prices_replace_n1 = prices_replace2.replace("Noch 1 auf Lager", "")
-    prices_replace_n2 = prices_replace_n1.replace("Noch 2 auf Lager", "")
-    prices_replace3 = prices_replace_n2.replace(" €", "")
-    price_list_dirty = prices_replace3.split("\n")
-
-    price_list = []
-
-    for element in price_list_dirty:
-        if element != "":
-            price_list.append(element)
-
-    driver.quit
-
-    new_list2 = []
-    for i in range(len(price_list)):
-        if i % 2 == 0:
-            size = price_list[i].replace('.5', '½')
-            new_list2.append(size)
-        else:
-            if price_list[i] != 'OOS':
-                price = float(price_list[i]) * 0.9 - 20
-                price_formatted = '{:.2f}'.format(price) + '€'
-                new_list2.append(price_formatted)
-            else:
-                new_list2.append(price_list[i])
-
-    new_lst3 = []
-    for item in new_list2:
-        if item == "OOS":
-            new_lst3.append("OOS!")
-        else:
-            new_lst3.append(item)
-
-
-    formatted_list = format_list(new_lst3)
-
-    return formatted_list
-  except:
-    return ("Product not found!")
-
-def hypeboost_stock(SKU):
-  try:
-    url = "https://hypeboost.com/en/search/shop?keyword=" + SKU
-    headers = {
-        "cookie": "country=eyJpdiI6ImlCRDJaRExPQkZYNTNlMmM0OWFEQVE9PSIsInZhbHVlIjoiTFRaRW01UW5wNUY2RjZnQzViWGlPYWRtYVRmbmxxMXpoRjNzODlZZUdIZmNLWjZSTFp0Q3htbTFuYUF4ZGkwVSIsIm1hYyI6IjQ0MzBlZTdkZmNhYjVhYmJhMDAzNDhlNjQ3MGU5NzQ1YThkOTk0ZDRkNzYxZGQzYzg0ODI0ZWYzZWZhODBlZGYiLCJ0YWciOiIifQ%253D%253D; currency=eyJpdiI6ImFlbkxaNHJyOHdUZlJFRlJ2dGlna0E9PSIsInZhbHVlIjoieEx2OE01VHhzOGZ1eFdsM09IVDFIZmR6R1hieHpDRDZScWoweVhqTDZjUzY2a3FFUmhQZGdPV2piaFN3OTViTCIsIm1hYyI6IjgzMTY0NDExNzljYjM1MzFmZmM5ZTBhOGY0MjU3ZWViMjA2NjBjYmUwMjg0MDFkMmUyYmJiNTVjYTUxZTk5MjMiLCJ0YWciOiIifQ%253D%253D",
-        "Content-Type": "application/json"
-    }
-
-    response = requests.request("GET", url, headers=headers)
-
-    soup = BeautifulSoup(response.content, 'html.parser')
-    for a in soup.find_all('a', href=True):
-      print("Product URL:", a['href'])
-
-    response_url = requests.get(a['href'])
-
-    soup2 = BeautifulSoup(response_url.text, 'html.parser')
-
-    sizes = []
-    for size_elem in soup2.select('.size'):
-        if 'available' in size_elem['class']:
-            label = size_elem.select_one('.label').text
-            price = size_elem.select_one('.price span').text.strip()
-            sizes.append(f"{label}: {price}")
-        elif 'sold-out' in size_elem['class']:
-            label = size_elem.select_one('.label').text
-            sizes.append(f"{label}: OOS!")
-
-    output = "\n".join(element.replace(" €", "€").replace(" ½", "½") for element in sizes)
-    print("Sizes & Prices Scraped!")
-    return output
-  except:
-    return ("Product not found!")
-
-def hypeboost_prices_payout(SKU):
-    try:
-      url = hypeboost_product_url(SKU)
-      r = requests.get(url)
-      soup = BeautifulSoup(r.text, 'html.parser')
-      sizes = soup.find_all('div', class_='size')
-      output = ""
-
-      for size in sizes:
-          label = size.find('div', class_='label').text.strip()
-          if 'data-price' in size.attrs:
-              price = size['data-price']
-              price = price.replace('\xa0', '')
-              price = price.replace(' ', '')
-              price = price.replace('€', '') + '€'
-          else:
-              price = 'OOS!'
-          output += label.replace(' ', '') + ': ' + price + "\n"
-      print("Scraped Payout Prices!")
-      return output
-    except:
-      return ("Product not found!")
-
-def sneakit_stock(SKU):
-  try:
-    raw = sneakit_info(SKU)
-    sizes = raw['data'][0]['product_variants_with_shop_price']
-    result = []
-    for entry in sizes:
-        result.append({'size': entry['size'], 'shop_price_in_eur': entry['shop_price_in_eur']})
-    result = sorted(result, key=lambda x: x['size'])
-    output_str = ''
-    for entry in sorted(result, key=lambda x: x['size']):
-        output_str += f"{entry['size']}: {entry['shop_price_in_eur']}€\n"
-    print("Scraped Sneakit Prices & Sizes!")
-    output_str2 = output_str.replace('.5', '½')
-    return output_str2
-  except:
-    return "Product not found!"
-
-def sneakit_url(SKU):
-  try:
-    produkt_code = SKU
-    global url
-    url = f"https://sneakit.com/search/products/{produkt_code}?query={produkt_code}&page=1"
-    print("Scraped Sneakit URL!", url)
-    return url
-  except:
-    return("https://sneakit.com/")
-
-def format_list(price_list):
-    result = ""
-    for i in range(len(price_list)):
-        if i % 2 == 0:
-            result += price_list[i] + ": "
-        else:
-            result += price_list[i]
-            if i < len(price_list) - 1 and price_list[i+1] != "":
-                result += "\n"
-    return result
-
-def sneakit_info(SKU):
-  try:
-    scraper = cloudscraper.create_scraper()
-    sneakit_url_r = sneakit_url(SKU)
-    r = scraper.get(sneakit_url_r)
-    global output
-    output = json.loads(r.text)
-    print("Scraped Sneakit info!")
-    return output
-  except:
-    return ("error")
-
-#price after fees
-def paypal_fees(price):
-  try:
-    price_raw = float(price)
-    fees1 = price_raw * 0.0249
-    fees2 = 0.35
-    all_fees = price_raw - fees1 - fees2
-    rounden_fees = round(all_fees, 2)
-    final_price = str(rounden_fees) + "€"
-    #print(final_price)
-    return final_price
-  except:
-    return ("something went wrong!")
-
-#only fees
-def paypal_fees_2(price):
-  try:
-    price_raw = float(price)
-    fees1 = price_raw * 0.0249
-    fees2 = 0.35
-    fees_all_1 = fees1 + fees2
-    rounded_fees = round(fees_all_1, 2)
-    fees_all = str(rounded_fees) + "€"
-    #print(fees_all)
-    return fees_all
-  except:
-    return ("something went wrong!")
-
-#price + fees
-def paypal_fees_3(price):
-  try:
-    price_raw = float(price)
-    fees1 = price_raw * 0.0249
-    fees2 = 0.35
-    price1 = float(price) + float(fees1) + float(fees2)
-    rounded_price = round(price1, 2)
-    rounden_price2 = str(rounded_price) + "€"
-    return rounden_price2
-  except:
-    return ("something went wrong!")
-
-def product_info_url_goat(SKU):
-    try:
-        product_id_url = f"https://ac.cnstrc.com/search/{SKU}?c=ciojs-client-2.29.12&key=key_XT7bjdbvjgECO5d8&i=5c1db6a2-7a42-4cbd-9606-96a08face508&s=23&num_results_per_page=25&_dt=1679422941544"
-        scraper = cloudscraper.create_scraper()
-        request = scraper.get(product_id_url)
-        json_product = json.loads(request.text)
-        ID = json_product['response']['results'][0]['data']['id']
-        base_url = "https://www.goat.com/web-api/v1/product_variants/buy_bar_data?productTemplateId="
-        request_url = base_url + ID + "&countryCode=EU"
-        print("Scraped GOAT URL!")
-        return request_url
-    except:
-        return ("https://www.goat.com/")
-
-
-
-def product_sizes_goat(SKU):
-    try:
-        request_url = product_info_url_goat(SKU)
-        scraper = cloudscraper.create_scraper()
-        request = scraper.get(request_url)
-        output = json.loads(request.text)
-
-        results = []
-        for entry in output:
-            if (entry['shoeCondition'] == "new_no_defects") and (entry['boxCondition'] == "good_condition"):
-                size = entry['sizeOption']['presentation']
-                try:
-                    price_cents = entry['lowestPriceCents']['amount']
-                except KeyError:
-                    price_cents = 'OOS!'
-                results.append((size, price_cents))
-
-        results2 = []
-        for entry in output:
-            if (entry['shoeCondition'] == "new_no_defects") and (entry['boxCondition'] == "good_condition"):
-                size = entry['sizeOption']['presentation']
-                try:
-                    price_cents = entry['lowestPriceCents']['amount'] / 100
-                    price_euro1 = price_cents - 1
-                    price_euro = str(price_euro1) + "€"
-                except KeyError:
-                    price_euro = 'OOS!'
-                results2.append((size, price_euro))
-
-        prices = [(size, price.replace('.0', '')) for size, price in results2]
-        output_str = ""
-        for element in prices:
-            output_str += f"{element[0]} : {element[1]}\n"
-
-        print("Scraped GOAT prices!")
-        return output_str
-    except:
-        return ("Product not found!")
-
-
-def product_img_goat(SKU):
-    try:
-        url = f"https://ac.cnstrc.com/search/{SKU}?c=ciojs-client-2.29.12&key=key_XT7bjdbvjgECO5d8&i=5c1db6a2-7a42-4cbd-9606-96a08face508&s=23&num_results_per_page=25&_dt=1679422941544"
-        scraper = cloudscraper.create_scraper()
-        request = scraper.get(url)
-        json_product = json.loads(request.text)
-        img = json_product['response']['results'][0]['data']['image_url']
-        print("Scraped GOAT product picture!")
-        return img
-    except:
-        return ("https://www.freecodecamp.org/news/content/images/2021/03/ykhg3yuzq8931--1-.png")
-
-
-def product_title_goat(SKU):
-    try:
-        url = f"https://ac.cnstrc.com/search/{SKU}?c=ciojs-client-2.29.12&key=key_XT7bjdbvjgECO5d8&i=5c1db6a2-7a42-4cbd-9606-96a08face508&s=23&num_results_per_page=25&_dt=1679422941544"
-        scraper = cloudscraper.create_scraper()
-        request = scraper.get(url)
-        json_product = json.loads(request.text)
-        title = json_product['response']['results'][0]['value']
-        print("Scraped GOAT product title!")
-        return title
-    except:
-        return ("Title not found!")
-
-def product_url_goat(SKU):
-    try:
-        base_url = "https://www.goat.com/sneakers/"
-        url = f"https://ac.cnstrc.com/search/{SKU}?c=ciojs-client-2.29.12&key=key_XT7bjdbvjgECO5d8&i=5c1db6a2-7a42-4cbd-9606-96a08face508&s=23&num_results_per_page=25&_dt=1679422941544"
-        scraper = cloudscraper.create_scraper()
-        request = scraper.get(url)
-        json_product = json.loads(request.text)
-        slug = json_product['response']['results'][0]['data']['slug']
-        product_url = base_url + slug
-        print("Scraped GOAT product url: " + product_url)
-        return product_url
-    except:
-        return("https://www.goat.com/")
+        commands = "\n".join([f"{key}: {value}" for key, value in prefixes.items()])
+        message_text = f"\n{commands}"
+
+        embed = discord.Embed(
+            title="Command List",
+            url="https://twitter.com/jakobaio",
+            color=0x11806a
+          )
+        embed.set_author(
+            name="Scraper commands",
+            url="https://twitter.com/jakobaio",
+            icon_url= "https://i.imgur.com/mtt9JCN.png"
+            )
+        embed.set_thumbnail(
+            url="https://cdn-icons-png.flaticon.com/512/7546/7546214.png"
+          )
+        embed.add_field(
+            name="Here are the commands:",
+            value=message_text,
+            inline=True
+          )
+        embed.add_field(
+            name="How to use:",
+            value=f"Example: {COMMAND_PREFIX_ALL} DD1503-101",
+            inline=False
+          )
+        embed.set_footer(
+            text=f"Developed by JakobAIO      |      Command list      |      {datetime.datetime.now().strftime('%H:%M:%S')}"
+          )
+        await message.channel.send(embed=embed)
+        print("Command list send!")
+
+    elif message.content.startswith("$"):
+      await message.channel.send("***Wrong command unfortunatly!***")
+      print("False command used!")
+      prefixes = {
+          "AIO Scraper": COMMAND_PREFIX_ALL,
+          "GOAT Scraper": COMMAND_PREFIX_GOAT,
+          "Restocks-Scraper": COMMAND_PREFIX_RESTOCKS,
+          "Hypeboost-Scraper": COMMAND_PREFIX_HYPEBOOST,
+          "Sneakit-Scraper": COMMAND_PREFIX_SNEAKIT,
+          "AIO Payout Scraper": COMMAND_PREFIX_PAYOUT_ALL,
+          "Restocks-Payout Scraper": COMMAND_PREFIX_RESTOCKS_PAYOUT,
+          "Hypeboost-Payout Scraper": COMMAND_PREFIX_HYPEBOOST_PAYOUT,
+          "Size Chart": SIZE_CHART_PREFIX,
+          "PayPal Fees Calculator": PAY_PAL_PREFIX,
+          "Command list": COMMAND_LIST,
+          "All product url's": URL_PREFIX
+      }
+
+      commands = "\n".join([f"{key}: {value}" for key, value in prefixes.items()])
+      message_text = f"\n{commands}"
+
+      embed = discord.Embed(
+          title="False command used!",
+          url="https://twitter.com/jakobaio",
+          color=0xe74c3c
+        )
+      embed.set_author(
+          name="Scraper command error!",
+          url="https://twitter.com/jakobaio",
+          icon_url= "https://i.imgur.com/mtt9JCN.png"
+          )
+      embed.set_thumbnail(
+          url="https://cdn.pixabay.com/photo/2013/04/01/09/21/attention-98513_960_720.png"
+        )
+      embed.add_field(
+          name="Here is a command list:",
+          value=message_text,
+          inline=True
+        )
+      embed.add_field(
+          name="How to use:",
+          value=f"Example: {COMMAND_PREFIX_ALL} DD1503-101",
+          inline=False
+        )
+      embed.set_footer(
+          text=f"Developed by JakobAIO      |      Command list      |      {datetime.datetime.now().strftime('%H:%M:%S')}"
+        )
+      await message.channel.send(embed=embed)
+      print("Command list send!")
+
+bot.run(TOKEN)
