@@ -70,6 +70,8 @@ Format examples:
 
 # Return message examples:
 
+![image](https://user-images.githubusercontent.com/103487648/228026944-5efa02df-6603-4c66-9948-84fe316530a6.png)
+
 ![image](https://user-images.githubusercontent.com/103487648/224563004-25393349-9909-4082-b6c0-5dc1bd3ceb42.png)
 
 ![image](https://user-images.githubusercontent.com/103487648/224563029-73f28597-7eb5-4a73-a6fc-10ab5afda2bd.png)
