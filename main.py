@@ -148,7 +148,7 @@ def restocks_stock(SKU):
     print('Scraped Restocks URL: ' + product_url)
 
     options = Options()
-    options.headless = False
+    options.headless = True
     driver = webdriver.Chrome(options=options)
     driver.get(product_url)
     cookies = driver.find_element(by=By.ID, value='save__first__localization__button')
