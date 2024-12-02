@@ -366,7 +366,6 @@ def paypal_fees(price):
     all_fees = price_raw - fees1 - fees2
     rounden_fees = round(all_fees, 2)
     final_price = str(rounden_fees) + "€"
-    #print(final_price)
     return final_price
   except:
     return ("something went wrong!")
